@@ -1,0 +1,281 @@
+
+Public Sub updateoffshore()
+
+
+Dim newreport As String
+MsgBox ("Open current month onshore report")
+newreport = openDialog()
+Workbooks.Open newreport
+
+Dim wb As Workbook
+Set wb = ActiveWorkbook
+
+Dim incomes1 As Worksheet
+Set incomes1 = Sheets("Income Statement")
+Dim targetCol As Long
+
+Dim wb2 As Workbook
+Dim FileName As String
+Dim nameToReplace As String
+MsgBox ("Open last month onshore report")
+FileName = openDialog()
+
+Workbooks.Open FileName
+Set wb2 = ActiveWorkbook
+nameToReplace = ActiveWorkbook.Name
+Dim incomes2 As Worksheet
+Set incomes2 = Sheets("Income Statement")
+incomes2.Activate
+
+targetCol = incomes2.Range("A8").End(xlToRight).Column + 1
+Range(Columns(targetCol), Columns(targetCol + 1)).Copy
+wb.Activate
+incomes1.Activate
+targetCol = incomes1.Range("A8").End(xlToRight).Column + 1
+Range(Columns(targetCol), Columns(targetCol + 1)).Select
+ActiveSheet.Paste
+
+Dim FileName2 As String
+MsgBox ("Open portfolio report")
+FileName2 = openDialog()
+Workbooks.Open FileName2
+Dim wb3 As Workbook
+Set wb3 = ActiveWorkbook
+Dim plreport As Worksheet
+Set plreport = Sheets("P&L Report")
+plreport.Activate
+
+Dim totalPL As Double
+totalPL = plreport.Range("M500").End(xlUp).Value
+wb.Activate
+incomes1.Activate
+targetCol = incomes1.Range("A8").End(xlToRight).Column + 1
+Dim targetRow As Long
+targetRow = incomes1.Cells(1, targetCol).End(xlDown).Row
+incomes1.Cells(targetRow, targetCol) = totalPL
+wb3.Close
+
+wb.Activate
+Dim ar As Worksheet
+Set ar = Sheets("AllocationsReport")
+ar.Activate
+On Error Resume Next
+'in case the sheet is protected
+ActiveSheet.Cells.EntireColumn.Hidden = False
+targetRow = ar.Range("A500").End(xlUp).Row - 1
+'ar.Range("S8:V" & Str(targetRow)).Interior.Color = 15773696
+Range( _
+        "AllocationsReport_Data[[Additions]:[Gross Redemption (Net + Incentive)]]"). _
+        Select
+    Application.CutCopyMode = False
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 15773696
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+ar.Activate
+Columns("AL:AM").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+Columns("AT:AU").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+Columns("AZ:BA").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+
+wb2.Activate
+Dim ar2 As Worksheet
+Set ar2 = Sheets("AllocationsReport")
+ar2.Activate
+Columns("AL:AM").Copy
+wb.Activate
+ar.Activate
+Columns("AL:AM").Select
+ActiveSheet.Paste
+
+wb2.Activate
+ar2.Activate
+Columns("AT:AU").Copy
+wb.Activate
+ar.Activate
+Columns("AT:AU").Select
+ActiveSheet.Paste
+
+wb2.Activate
+ar2.Activate
+Columns("AZ:BA").Copy
+wb.Activate
+ar.Activate
+Columns("AZ:BA").Select
+ActiveSheet.Paste
+
+wb2.Activate
+ar2.Activate
+Range("G1:BJ6").Copy
+wb.Activate
+ar.Activate
+Range("G1").Select
+ActiveSheet.Paste
+
+Dim replacestring As String
+replacestring = "[" & nameToReplace & "]"
+MsgBox (replacestring)
+Cells.Replace What:=replacestring _
+        , Replacement:="", LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:= _
+        False, SearchFormat:=False, ReplaceFormat:=False
+
+replacestring = "'" & nameToReplace & "'!"
+MsgBox (replacestring)
+Cells.Replace What:=replacestring _
+        , Replacement:="", LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:= _
+        False, SearchFormat:=False, ReplaceFormat:=False
+
+wb2.Close
+
+Dim newreport2 As String
+MsgBox ("Open current month offshore report")
+newreport2 = openDialog()
+Workbooks.Open newreport2
+
+Dim wb4 As Workbook
+Set wb4 = ActiveWorkbook
+
+Dim wb5 As Workbook
+Dim FileName4 As String
+Dim nameToReplace2 As String
+MsgBox ("Open last month offshore report")
+FileName4 = openDialog()
+
+Workbooks.Open FileName4
+Set wb5 = ActiveWorkbook
+nameToReplace2 = ActiveWorkbook.Name
+
+wb4.Activate
+Dim ar3 As Worksheet
+Set ar3 = Sheets("AllocationsReport")
+ar3.Activate
+On Error Resume Next
+'in case the sheet is protected
+ActiveSheet.Cells.EntireColumn.Hidden = False
+
+Range( _
+        "AllocationsReport_Data_111[[Additions]:[Gross Redemption (Net + Incentive)]]") _
+        .Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 15773696
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+ar3.Activate
+Columns("AL:AM").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+Columns("AT:AU").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+Columns("AZ:BA").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+
+wb5.Activate
+Dim ar4 As Worksheet
+Set ar4 = Sheets("AllocationsReport")
+ar4.Activate
+Columns("AL:AM").Copy
+wb4.Activate
+ar3.Activate
+Columns("AL:AM").Select
+ActiveSheet.Paste
+
+wb5.Activate
+ar4.Activate
+Columns("AT:AU").Copy
+wb4.Activate
+ar3.Activate
+Columns("AT:AU").Select
+ActiveSheet.Paste
+
+wb5.Activate
+ar4.Activate
+Columns("AZ:BA").Copy
+wb4.Activate
+ar3.Activate
+Columns("AZ:BA").Select
+ActiveSheet.Paste
+
+wb5.Activate
+ar4.Activate
+Range("AS1").Copy
+wb4.Activate
+ar3.Activate
+Range("AS1").Select
+ActiveSheet.Paste
+
+replacestring = "[" & nameToReplace2 & "]"
+Cells.Replace What:=replacestring _
+        , Replacement:="", LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:= _
+        False, SearchFormat:=False, ReplaceFormat:=False
+
+replacestring = "'" & nameToReplace2 & "'!"
+Cells.Replace What:=replacestring _
+        , Replacement:="", LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:= _
+        False, SearchFormat:=False, ReplaceFormat:=False
+        
+wb4.Activate
+ar3.Activate
+
+Dim neededRow As Double
+neededRow = ar3.Range("AY500").End(xlUp).Row
+
+Dim pastevalue1 As Double
+pastevalue1 = ar3.Cells(neededRow, "AY").Value
+
+Dim pastevalue2 As Double
+pastevalue2 = ar3.Cells(neededRow, "AP").Value + ar3.Cells(neededRow, "AQ").Value + ar3.Cells(neededRow, "AR").Value
+
+Dim pastevalue3 As Double
+pastevalue3 = ar3.Cells(neededRow, "AE").Value
+
+wb.Activate
+ar.Activate
+ar.Range("AY3") = pastevalue1
+ar.Range("AS4") = pastevalue2
+ar.Range("AE3") = pastevalue3
+
+
+'Dim FileName3 As String
+'MsgBox ("Open portfolio attribution")
+'FileName3 = openDialog()
+'Workbooks.Open FileName3
+'Dim wb4 As Workbook
+'Set wb4 = ActiveWorkbook
+
+End Sub
+
+Private Function openDialog()
+    Dim fd As Office.FileDialog
+
+    Set fd = Application.FileDialog(msoFileDialogFilePicker)
+
+   With fd
+   
+   .InitialFileName = "Z:\Operations\EOD P&L\PNL Link\"
+
+      .AllowMultiSelect = False
+
+      ' Set the title of the dialog box.
+      .Title = "Please select the file."
+
+      ' Clear out the current filters, and add our own.
+      '.Filters.Clear
+      '.Filters.Add "Excel 2003", "*.xls"
+      '.Filters.Add "All Files", "*.*"
+
+      ' Show the dialog box. If the .Show method returns True, the
+      ' user picked at least one file. If the .Show method returns
+      ' False, the user clicked Cancel.
+      If .Show = True Then
+        txtFileName = .SelectedItems(1) 'replace txtFileName with your textbox
+        
+      End If
+   End With
+openDialog = txtFileName
+End Function
+
+
+

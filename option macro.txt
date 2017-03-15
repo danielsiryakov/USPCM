@@ -1,0 +1,66 @@
+Sub optionExpiration()
+    Dim pl As Worksheet
+    Set pl = Sheets("P&L")
+
+    Dim today As Date
+    today = Date
+    Dim optionRow As Integer
+    For Each cell In Range("UnderlineTickers")
+        optionRow = cell.row
+        quantity = pl.Cells(optionRow, "E").Value
+        putcall = pl.Cells(optionRow, "W").Value
+        Strike = pl.Cells(optionRow, "S").Value
+        If cell <> "" And pl.Cells(optionRow, "Z").Value = today And pl.Cells(optionRow, "AC").Value < 0 Then
+        
+            pl.Rows(Range("EQUITY" & "lastrow").row).Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
+            pl.Rows(Range("EQUITY" & "lastrow").row).Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
+              
+            'Sets the counter as the first row in the bucket
+            'ie if user chose "E" for Equity bucket then Asset = "EQUITY"
+            'z becomes Range("EQUITYfirstrow") or Range("SSfirstrow")
+            z = Range("EQUITYfirstrow").row
+            
+            'Loops until it finds a line to copy from that matches CopyCondition
+            Do
+                z = z + 1
+                MyInput2 = z
+            Loop While pl.Cells(z, "AE") <> "Equity"
+            
+            'Use target Row instead of retyping that code
+            'Makes the code faster and cleaner
+            targetRow = Range("EQUITYlastrow").row - 2
+            
+            'copies the proper row and then pastes it
+            pl.Rows(MyInput2).Copy
+            pl.Rows(targetRow).Select
+            pl.Paste
+            
+            
+            'changes the ticker to the trade ticker and then formulas should pick up the correct information
+            pl.Cells(targetRow, "A") = cell & " Equity"
+            pl.Cells(targetRow, "O") = "Equity"
+    
+            pl.Rows(targetRow).Select
+            pl.Cells(targetRow, "F") = Strike
+            
+            If quantity > 0 And putcall = "Put" Then
+                pl.Cells(targetRow, "C") = "S"
+                pl.Cells(targetRow, "E") = -quantity * 100
+            ElseIf quantity < 0 And putcall = "Put" Then
+                pl.Cells(targetRow, "C") = "L"
+                pl.Cells(targetRow, "E") = quantity * 100
+            ElseIf quantity > 0 And putcall = "Call" Then
+                pl.Cells(targetRow, "C") = "L"
+                pl.Cells(targetRow, "E") = quantity * 100
+            ElseIf quantity < 0 And putcall = "Call" Then
+                pl.Cells(targetRow, "C") = "S"
+                pl.Cells(targetRow, "E") = -quantity * 100
+            End If
+            
+            'Changes new position font color to green
+            With Selection.Font
+                .Color = -11489280
+                .TintAndShade = 0
+            End With
+
+End Sub

@@ -1,0 +1,36 @@
+Public Sub UpdateDailyAttribution()
+    Dim wb1, wb2 As Workbook
+    Set wb1 = ActiveWorkbook
+    
+    Dim targetCol As Long
+    Dim da As Worksheet
+    Set da = Sheets("Daily Attribution")
+    
+    Dim FileName As String
+    FileName = openDialog()
+    Workbooks.Open FileName
+    Set wb2 = ActiveWorkbook
+    
+    wb1.Activate
+    Dim rng As Range
+    
+    
+    Range(da.Rage("A5"), da.Range("A5").End(xlDown)).Copy
+    targetCol = da.Range("A5").End(xlToRight).Column + 1
+    da.Cells(5, targetCol).PasteSpecial Paste:=xlPasteFormulas
+    da.Range(da.Cells(5, targetCol), da.Cells(16, targetCol)).Value = da.Range(da.Cells(5, targetCol), da.Cells(16, targetCol)).Value
+    da.Range(da.Cells(22, targetCol), da.Cells(34, targetCol)).Value = da.Range(da.Cells(22, targetCol), da.Cells(34, targetCol)).Value
+    
+    Dim sad As Worksheet
+    Set sad = Sheets("Security Attribution Daily")
+    sad.Activate
+    targetCol = sad.Range("G4").End(xlToRight).Column + 1
+    sad.Cells(3, targetCol).FormulaR1C1 = "=WORKDAY(RC[-6],1)"
+    sad.Cells(2, targetCol).FormulaR1C1 = "=TEXT(R[1]C,""mmddyy"")"
+    sad.Range("B4:G4").Copy
+    sad.Cells(4, targetCol).PasteSpecial Paste:=xlPasteFormulas
+    sad.Range(Cells(4, targetCol), Cells(4, targetCol + 5)).AutoFill Destination:=sad.Range(Cells(4, targetCol), Cells(405, targetCol + 5))
+    
+    'sad.Range(Cells(4, targetCol), Cells(405, targetCol + 5)).Value = sad.Range(Cells(4, targetCol), Cells(405, targetCol + 5)).Value
+    
+End Sub

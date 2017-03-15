@@ -1,0 +1,263 @@
+Public Sub Month_End_Port_Recon()
+
+
+Dim newreport As String
+MsgBox ("Open current month portfolio report")
+newreport = openDialog1()
+Workbooks.Open newreport
+
+Dim wb As Workbook
+Set wb = ActiveWorkbook
+
+Dim hr1 As Worksheet
+Dim plreport1 As Worksheet
+Set hr1 = Sheets("Holdings Report")
+Set plreport1 = Sheets("P&L Report")
+Dim targetCol As Long
+
+Dim wb2 As Workbook
+Dim FileName As String
+Dim nameToReplace As String
+MsgBox ("Open last month portfolio report")
+FileName = openDialog1()
+
+Workbooks.Open FileName
+Set wb2 = ActiveWorkbook
+Dim hr2 As Worksheet
+Dim plreport2 As Worksheet
+Set hr2 = Sheets("Holdings Report")
+Set plreport2 = Sheets("P&L Report")
+hr2.Activate
+
+'targetCol = incomes2.Range("A8").End(xlToRight).Column + 1
+Columns("N:S").Copy
+wb.Activate
+hr1.Activate
+'targetCol = incomes1.Range("A8").End(xlToRight).Column + 1
+Columns("N:S").Select
+ActiveSheet.Paste
+
+wb2.Activate
+plreport2.Activate
+Columns("N:AA").Copy
+wb.Activate
+plreport1.Activate
+'targetCol = incomes1.Range("A8").End(xlToRight).Column + 1
+Columns("N:AA").Select
+ActiveSheet.Paste
+
+wb2.Activate
+plreport2.Activate
+Range("I1:M4").Copy
+wb.Activate
+plreport1.Activate
+'targetCol = incomes1.Range("A8").End(xlToRight).Column + 1
+Range("I1").Select
+ActiveSheet.Paste
+
+Application.DisplayAlerts = false
+wb2.Close
+Application.DisplayAlerts = true
+
+Dim oldfile As String
+MsgBox ("select previous month's last EOD file")
+oldfile = openDialog2()
+oldfile1 = Split(oldfile, "\")
+MsgBox (oldfile1(UBound(oldfile1)))
+
+Dim newfile As String
+MsgBox ("select current month's last EOD file")
+newfile = openDialog2()
+newfile1 = Split(newfile, "\")
+MsgBox (newfile1(UBound(newfile1)))
+
+Dim wbEOD  As Workbook
+Workbooks.Open newfile 
+
+wb.Activate
+plreport1.Activate
+
+Dim replacestring, replacestring1 As String
+replacestring = "[" & oldfile1(UBound(oldfile1)) & "]"
+replacestring1 = "[" & newfile1(UBound(newfile1)) & "]"
+
+Cells.Replace What:=replacestring _
+        , Replacement:=replacestring1, LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:= _
+        False, SearchFormat:=False, ReplaceFormat:=False
+        
+plreport1.Activate
+plreport1.Range("P7:R1000").Clear
+
+Dim monthDate As Date
+monthDate = plreport1.Range("C1").Value
+Dim MonthValue As Long
+Dim YearValue As Long
+MonthValue = Month(monthDate)
+YearValue = Year(monthDate)
+        
+Dim AttFileName As String
+AttFileName = "Z:\Operations\Reports\Portfolio Attribution.xlsm"
+Workbooks.Open AttFileName
+Dim wbatt As Workbook
+Set wbatt = ActiveWorkbook
+
+wbatt.Activate
+Dim sam As Worksheet
+Set sam = Sheets("Security Attribution Monthly")
+sam.Activate
+
+Dim targetCol2 As Long
+Dim targetCol3 As Long
+
+For targetCol3 = sam.Range("XFD2").End(xlToLeft).Column - 2 To 1 Step -4
+    If Month(sam.Cells(2, targetCol3).Value) = MonthValue And Year(sam.Cells(2, targetCol3).Value) = YearValue Then
+        targetCol2 = targetCol3
+        Exit For
+    End If
+Next targetCol3
+
+sam.Range(sam.Cells(3, targetCol2), sam.Cells(500, targetCol2 + 2)).Copy
+wb.Activate
+plreport1.Activate
+plreport1.Range("P7").PasteSpecial xlPasteValues
+
+wbatt.Activate
+Dim NAV As Worksheet
+Set NAV = Sheets("NAV")
+NAV.Activate
+Dim targetMonth As Long
+Dim targetYear As Long
+
+targetCol2 = NAV.Range("C1").End(xlToRight).Column
+For targetCol3 = NAV.Range("C1").End(xlToRight).Column To 1 Step -1
+    targetMonth = Month(NAV.Cells(1, targetCol3).Value)
+    targetYear = Year(NAV.Cells(1, targetCol3).Value)
+    If targetMonth = MonthValue And targetYear = YearValue Then
+        targetCol2 = targetCol3
+        Exit For
+    End If
+Next targetCol3
+
+Dim J3, L3 As Double
+J3 = NAV.Cells(11, targetCol2).Value
+L3 = NAV.Cells(12, targetCol2).Value
+wb.Activate
+plreport1.Activate
+
+plreport1.Range("J3").Value = J3
+plreport1.Range("L3").Value = L3
+
+Dim lastRowPR As Long
+lastRowPR = plreport1.Range("P5").End(xlDown).Row
+plreport1.Range("T7:Y7").Select
+Selection.AutoFill Destination:=Range(plreport1.Cells(7, "T"), plreport1.Cells(lastRowPR, "Y"))
+    
+'Dim lastRow As Long
+'lastRow = plreport1.Range("G7").End(xlDown).Row
+
+plreport1.Columns("R:R").NumberFormat = "_(* #,##0_);_(* (#,##0);_(* ""-""??_);_(@_)"
+plreport1.Columns("Q:Q").NumberFormat = "_(* #,##0_);_(* (#,##0);_(* ""-""??_);_(@_)"
+
+plreport1.activate
+plreport1.Range("V4:V500").Select
+    With Selection.Interior
+        .Pattern = xlNone
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+targetCol = plreport1.range("I500").
+for i = 7 to 
+End Sub
+
+
+Private Function openDialog()
+    Dim fd As Office.FileDialog
+
+    Set fd = Application.FileDialog(msoFileDialogFilePicker)
+
+   With fd
+   
+   .InitialFileName = "Z:\Operations\Month-End"
+
+      .AllowMultiSelect = False
+
+      ' Set the title of the dialog box.
+      .Title = "Please select the file."
+
+      ' Clear out the current filters, and add our own.
+      '.Filters.Clear
+      '.Filters.Add "Excel 2003", "*.xls"
+      '.Filters.Add "All Files", "*.*"
+
+      ' Show the dialog box. If the .Show method returns True, the
+      ' user picked at least one file. If the .Show method returns
+      ' False, the user clicked Cancel.
+      If .Show = True Then
+        txtFileName = .SelectedItems(1) 'replace txtFileName with your textbox
+        
+      End If
+   End With
+openDialog = txtFileName
+End Function
+
+Private Function openDialog1()
+    Dim fd As Office.FileDialog
+
+    Set fd = Application.FileDialog(msoFileDialogFilePicker)
+
+   With fd
+   
+   .InitialFileName = "Z:\Operations\Month-End"
+
+      .AllowMultiSelect = False
+
+      ' Set the title of the dialog box.
+      .Title = "Please select the file."
+
+      ' Clear out the current filters, and add our own.
+      '.Filters.Clear
+      '.Filters.Add "Excel 2003", "*.xls"
+      '.Filters.Add "All Files", "*.*"
+
+      ' Show the dialog box. If the .Show method returns True, the
+      ' user picked at least one file. If the .Show method returns
+      ' False, the user clicked Cancel.
+      If .Show = True Then
+        txtFileName = .SelectedItems(1) 'replace txtFileName with your textbox
+        
+      End If
+   End With
+openDialog = txtFileName
+End Function
+
+Private Function openDialog2()
+    Dim fd As Office.FileDialog
+
+    Set fd = Application.FileDialog(msoFileDialogFilePicker)
+
+   With fd
+   
+   .InitialFileName = "Z:\Operations\EOD P&L"
+
+      .AllowMultiSelect = False
+
+      ' Set the title of the dialog box.
+      .Title = "Please select the file."
+
+      ' Clear out the current filters, and add our own.
+      '.Filters.Clear
+      '.Filters.Add "Excel 2003", "*.xls"
+      '.Filters.Add "All Files", "*.*"
+
+      ' Show the dialog box. If the .Show method returns True, the
+      ' user picked at least one file. If the .Show method returns
+      ' False, the user clicked Cancel.
+      If .Show = True Then
+        txtFileName = .SelectedItems(1) 'replace txtFileName with your textbox
+        
+      End If
+   End With
+openDialog = txtFileName
+End Function
+

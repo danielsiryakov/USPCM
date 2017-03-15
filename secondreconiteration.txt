@@ -1,0 +1,72 @@
+Public Sub Month_End_Port_Recon()
+
+
+Dim newreport As String
+MsgBox ("Open second iteration portfolio report")
+newreport = openDialog1()
+Workbooks.Open newreport
+
+Dim wb As Workbook
+Set wb = ActiveWorkbook
+
+Dim hr1 As Worksheet
+Dim plreport1 As Worksheet
+Set hr1 = Sheets("Holdings Report")
+Set plreport1 = Sheets("P&L Report")
+Dim targetCol As Long
+
+Dim wb2 As Workbook
+Dim FileName As String
+Dim nameToReplace As String
+MsgBox ("Open first iteraton report")
+FileName = openDialog1()
+
+Workbooks.Open FileName
+Set wb2 = ActiveWorkbook
+Dim hr2 As Worksheet
+Dim plreport2 As Worksheet
+Set hr2 = Sheets("Holdings Report")
+Set plreport2 = Sheets("P&L Report")
+hr2.Activate
+
+'targetCol = incomes2.Range("A8").End(xlToRight).Column + 1
+Columns("N:S").Copy
+wb.Activate
+hr1.Activate
+'targetCol = incomes1.Range("A8").End(xlToRight).Column + 1
+Columns("N:S").Select
+ActiveSheet.Paste
+
+wb2.Activate
+plreport2.Activate
+Columns("N:AA").Copy
+wb.Activate
+plreport1.Activate
+'targetCol = incomes1.Range("A8").End(xlToRight).Column + 1
+Columns("N:AA").Select
+ActiveSheet.Paste
+
+wb2.Activate
+plreport2.Activate
+Range("I1:M4").Copy
+wb.Activate
+plreport1.Activate
+'targetCol = incomes1.Range("A8").End(xlToRight).Column + 1
+Range("I1").Select
+ActiveSheet.Paste
+
+wb2.activate
+plreport2.Activate
+plreport2.Columns("I:I").Copy
+wb1.activate
+plreport1.Activate
+plreport1.Columns("I:I").Select
+    Selection.PasteSpecial Paste:=xlPasteFormats, Operation:=xlNone, _
+        SkipBlanks:=False, Transpose:=False
+    Application.CutCopyMode = False
+
+Application.DisplayAlerts = false
+wb2.Close
+Application.DisplayAlerts = true
+
+end sub
